@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ore Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+
+        .green-dot {
+            background-color: #207107;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            animation: blink 1s linear infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e1e;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            margin: 10px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+            max-width: 100%;
+            align-self: flex-start;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: transparent; /* Impostare il colore di sfondo trasparente */
+            border: 1px solid transparent; /* Impostare il bordo trasparente */
+            color: #fff;
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left; /* Allinea il testo a sinistra */
+            border-bottom: 1px solid #444;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        th {
+            background-color: #3498db;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 16px;
+            width: 33%; /* Imposta la larghezza della colonna al 33% */
+        }
+
+        td {
+            background-color: #1f1f1f;
+            font-size: 16px;
+            width: 33%; /* Imposta la larghezza della colonna al 33% */
+        }
+
+        tr:first-child th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        tr:first-child th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        tr:last-child td:first-child {
+            border-radius: 0 0 0 10px;
+        }
+
+        tr:last-child td:last-child {
+            border-radius: 0 0 10px 0;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                flex: 1;
+                max-width: 45%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            th, td {
+                font-size: 14px;
+            }
+        }
+
+
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h3 {
+                font-size: 20px;
+            }
+        }
+        .wallet-address {
+            filter: blur(5px);
+        }
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            function showGreenDot() {
+                document.getElementById("green-dot").style.display = "block";
+            }
+
+            function hideGreenDot() {
+                document.getElementById("green-dot").style.display = "none";
+            }
+
+
+
+            function updateMinerTable(data) {
+                $('#miner-table tbody').empty();
+                data.forEach(function(item) {
+                    $('#miner-table tbody').append(`<tr><td>${item.miner}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
+                });
+            }
+
+            function updateMinerSummaryTable(data) {
+                $('#miner-summary-table tbody').empty();
+                let summaryMiners = [];
+
+                summaryMiners.push({
+                    ore_price: data.ore_price,
+                    unclaimed: data.unclaimed,
+                    value: data.value,
+                });
+
+                summaryMiners.forEach(function(item) {
+                    $('#miner-summary-table tbody').append(`<tr><td>${item.ore_price}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
+                });
+            }
+
+            function updateWalletSummaryTable(data) {
+                $('#wallet-summary-table tbody').empty();
+                let summaryItems = [];
+
+                summaryItems.push({
+                    quantity: data.quantity,
+                    best: data.best,
+                    value: data.value,
+                });
+
+                summaryItems.forEach(function (item) {
+                    $('#wallet-summary-table tbody').append(`<tr><td>${item.quantity}</td><td>${item.best}</td><td>${item.value}</td></tr>`);
+                });
+            }
+
+            function updateWalletTable(data) {
+                $('#wallet-table tbody').empty();
+                data.forEach(function(wallet, index) {
+                    let tokensTable = '';
+                    if (wallet.tokens) {
+                        wallet.tokens.forEach(function(token) {
+                            tokensTable += `<tr><td>${token.name}</td><td>${token.balance}</td><td>${token.value}</td><td>${token.price}</td></tr>`;
+                        });
+                    }
+                    $('#wallet-table-tbody').append(`<tr><td>${wallet.wallet}</td><td><img class="wallet-address" id="wallet-address-${index}" src="data:image/png;base64,${wallet.address}" width="100"/></td><td>${wallet.value}</td>
+        <td>
+            <table id="token-table" class="token-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Balance</th>
+                        <th>Value</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>${tokensTable}</tbody>
+            </table>
+        </td></tr>`);
+                });
+
+
+                $('#wallet-table').on('click', '.wallet-address', function() {
+                    if ($(this).css('filter') === 'none') {
+                        $(this).css('filter', 'blur(5px)');
+                    } else {
+                        $(this).css('filter', 'none');
+                    }
+                });
+            }
+
+
+            function updateErrorTable(errors) {
+                $('#error-table tbody').empty();
+                errors.forEach(function(error) {
+                    $('#error-table tbody').append(`<tr><td>${error}</td></tr>`);
+                });
+            }
+
+            function fetchData() {
+                showGreenDot();
+                $.getJSON('/data', function(response) {
+                    updateMinerTable(response.miners);
+                    updateMinerSummaryTable(response.miner_summary);
+                    updateWalletSummaryTable(response.wallet_summary);
+                    updateWalletTable(response.wallets);
+                    if (response.errors && response.errors.length > 0) {
+                        updateErrorTable(response.errors);
+                        $('#error-table').show();
+                    } else {
+                        $('#error-table').hide();
+                    }
+                    hideGreenDot();
+                });
+
+
+            }
+
+            fetchData();
+            setInterval(fetchData, 60000);
+        });
+    </script>
+</head>
+<body>
+<div id="green-dot" class="green-dot"></div>
+<div class="main-container">
+        <div class="container">
+        <h3>Wallet Overview</h3>
+        <table id="wallet-summary-table">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Best</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table id="wallet-table" class="wallet-table">
+            <thead>
+            <tr>
+                <th>Wallet</th>
+                <th>Address</th>
+                <th>Value</th>
+                <th>Tokens</th>
+            </tr>
+            </thead>
+            <tbody id="wallet-table-tbody">
+            </tbody>
+        </table>
+        <table id="error-table" style="display: none;">
+            <thead>
+            <tr>
+                <th>Error</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+        <div class="container">
+        <h3>Miner Overview</h3>
+        <table id="miner-summary-table">
+            <thead>
+            <tr>
+                <th>Ore Price</th>
+                <th>Unclaimed</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table id="miner-table">
+            <thead>
+            <tr>
+                <th>Miner</th>
+                <th>Unclaimed</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
