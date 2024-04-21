@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/caarlos0/env/v6"
+	"github.com/robfig/cron"
 	"github.com/sirupsen/logrus"
 	"html/template"
 	"net/http"
@@ -78,7 +79,14 @@ func main() {
 
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
+	cr := cron.New()
+	_ = cr.AddFunc("* * * *", func() {
+		i.Init()
+	})
+	cr.Start()
+
 	if err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.ServerPort), nil); err != nil {
 		logrus.WithError(err).Panic("cannot init server")
 	}
+
 }
