@@ -48,7 +48,7 @@ func main() {
 		cfg.RpcUrl,
 		tokenMap,
 		cfg.SolCli,
-		i.Init(),
+		0,
 	)
 
 	templateDir := filepath.Join(currentDir, "pkg", "templates")
@@ -80,7 +80,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	cr := cron.New()
-	_ = cr.AddFunc("* * * *", func() {
+	_ = cr.AddFunc("* * * * *", func() {
 		i.Init()
 	})
 	cr.Start()

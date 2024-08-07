@@ -23,16 +23,28 @@ func NewOreUnclaimedData(oreCli string) *UnclaimedData {
 }
 
 func (u *UnclaimedData) Get(keypair string) (float64, error) {
-	cmd := exec.Command(u.oreCli, "rewards", "--keypair", keypair)
+	cmd := exec.Command(u.oreCli, "balance", "--keypair", keypair)
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return 0, err
 	}
-	unclaimed, err := strconv.ParseFloat(strings.TrimSpace(strings.Split(stdout.String(), " ")[0]), 64)
-	if err != nil {
-		return 0, err
+
+	var unclaimed float64
+	lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+	for _, line := range lines {
+		parts := strings.Fields(line)
+		if len(parts) >= 3 {
+			valueStr := parts[1]
+			value, err := strconv.ParseFloat(valueStr, 64)
+			if err != nil {
+				return 0, err
+			}
+			if parts[0] == "Stake:" {
+				unclaimed = value
+			}
+		}
 	}
 	return unclaimed, nil
 }
