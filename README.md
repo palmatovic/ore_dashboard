@@ -124,7 +124,7 @@ If you find this project helpful and wish to further support the developer, cons
 
 - **Virtual Coffee**: A small gesture to keep the developer awake and focused during long coding sessions.
 - **Project Contribution**: Contribute code, report bugs, or suggest new features.
-- **Feedback and Support**: Provide positive feedback and support to the developers in community discussions or via email.
+- **Feedback and Support**: Provide positive feedback and support to the developers in community discussions.
 - **Solana Wallet**: You can also leave a tip via Solana. Here's the wallet address: BDDRUtLsEbAVRXyeFcU4U2BuNzBwgbeH8JVoGpkxseNu
 
 Thank you for your support and for helping make this project even better!
