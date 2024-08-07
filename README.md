@@ -113,7 +113,7 @@ $ sudo systemctl enable your_service_name
 $ sudo systemctl init your_service_name
 ```
 
-## Screenshots
+## Screenshot
 
 ![UI](ui.png)
 
