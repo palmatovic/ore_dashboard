@@ -3,11 +3,9 @@ package main
 import (
 	"Ore/pkg/service"
 	"Ore/pkg/util"
-	i "Ore/pkg/util/init"
 	"encoding/json"
 	"fmt"
 	"github.com/caarlos0/env/v6"
-	"github.com/robfig/cron"
 	"github.com/sirupsen/logrus"
 	"html/template"
 	"net/http"
@@ -70,10 +68,6 @@ func main() {
 	fs := http.FileServer(http.Dir(staticDir))
 
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
-	cr := cron.New()
-	_ = cr.AddFunc("@every 1m", i.Init)
-	cr.Start()
 
 	if err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.ServerPort), nil); err != nil {
 		logrus.WithError(err).Panic("cannot init server")

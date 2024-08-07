@@ -10,7 +10,7 @@ Currently, the update frequency has been set statically, every 60 seconds.
 
 ## Prerequisites
 
-- Golang 1.21
+- Golang 1.22.5
 - [Ore CLI](https://ore.supply/download)
 - Solana Keypair Folder: each file must have sintax like "**id_x.json**" where "**x**" is an integer
 
