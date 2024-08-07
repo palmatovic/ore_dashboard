@@ -29,7 +29,7 @@ type Service struct {
 	solanaCli         string
 }
 
-func NewService(unclaimedData *util.UnclaimedData, orePrice *util.TokenPrice, keyPairFolderPath string, rpcUrl string, tokensToSearch map[string]string, solanaCli string, i int) *Service {
+func NewService(unclaimedData *util.UnclaimedData, orePrice *util.TokenPrice, keyPairFolderPath string, rpcUrl string, tokensToSearch map[string]string, solanaCli string) *Service {
 	return &Service{unclaimedData, orePrice, keyPairFolderPath, rpcUrl, tokensToSearch, solanaCli}
 }
 

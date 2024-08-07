@@ -41,15 +41,7 @@ func main() {
 		"SOL": "So11111111111111111111111111111111111111112",
 	}
 
-	s := service.NewService(
-		util.NewOreUnclaimedData(cfg.OreCli),
-		util.NewTokensPrice(cfg.JupApiUrl),
-		cfg.KeyPairFolderPath,
-		cfg.RpcUrl,
-		tokenMap,
-		cfg.SolCli,
-		0,
-	)
+	s := service.NewService(util.NewOreUnclaimedData(cfg.OreCli), util.NewTokensPrice(cfg.JupApiUrl), cfg.KeyPairFolderPath, cfg.RpcUrl, tokenMap, cfg.SolCli)
 
 	templateDir := filepath.Join(currentDir, "pkg", "templates")
 
@@ -80,9 +72,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	cr := cron.New()
-	_ = cr.AddFunc("* * * * *", func() {
-		i.Init()
-	})
+	_ = cr.AddFunc("@every 1m", i.Init)
 	cr.Start()
 
 	if err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.ServerPort), nil); err != nil {
