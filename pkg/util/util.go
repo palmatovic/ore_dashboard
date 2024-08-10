@@ -33,10 +33,13 @@ func NewUnclaimedData(oreCli string, orzCli string) *UnclaimedData {
 
 func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 	cli := u.oreCli
+	command := "balance"
 	if c == OrzCLI {
 		cli = u.orzCli
+		command = "rewards"
 	}
-	cmd := exec.Command(cli, "balance", "--keypair", keypair)
+	cmd := exec.Command(cli, command, "--keypair", keypair)
+
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
