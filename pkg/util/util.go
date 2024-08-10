@@ -12,38 +12,59 @@ import (
 	"strings"
 )
 
+type CLI int64
+
+const (
+	OreCLI CLI = iota
+	OrzCLI
+)
+
 type UnclaimedData struct {
 	oreCli string
+	orzCli string
 }
 
-func NewOreUnclaimedData(oreCli string) *UnclaimedData {
+func NewUnclaimedData(oreCli string, orzCli string) *UnclaimedData {
 	return &UnclaimedData{
 		oreCli: oreCli,
+		orzCli: orzCli,
 	}
 }
 
-func (u *UnclaimedData) Get(keypair string) (float64, error) {
-	cmd := exec.Command(u.oreCli, "balance", "--keypair", keypair)
+func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
+	cli := u.oreCli
+	if c == OrzCLI {
+		cli = u.orzCli
+	}
+	cmd := exec.Command(cli, "balance", "--keypair", keypair)
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		return 0, err
 	}
-
+	var err error
 	var unclaimed float64
-	lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
-	for _, line := range lines {
-		parts := strings.Fields(line)
-		if len(parts) >= 3 {
-			valueStr := parts[1]
-			value, err := strconv.ParseFloat(valueStr, 64)
-			if err != nil {
-				return 0, err
+	if c == OreCLI {
+		lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+		for _, line := range lines {
+			parts := strings.Fields(line)
+			if len(parts) >= 3 {
+				valueStr := parts[1]
+				var value float64
+				value, err = strconv.ParseFloat(valueStr, 64)
+				if err != nil {
+					return 0, err
+				}
+				if parts[0] == "Stake:" {
+					unclaimed = value
+				}
 			}
-			if parts[0] == "Stake:" {
-				unclaimed = value
-			}
+		}
+	} else if c == OrzCLI {
+		unclaimed, err = strconv.ParseFloat(strings.TrimSpace(strings.Split(stdout.String(), " ")[0]), 64)
+		if err != nil {
+			return 0, err
 		}
 	}
 	return unclaimed, nil

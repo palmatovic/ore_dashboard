@@ -160,28 +160,47 @@
 
 
 
-            function updateMinerTable(data) {
-                $('#miner-table tbody').empty();
+            function updateMinerOreTable(data) {
+                $('#miner-ore-table tbody').empty();
                 data.forEach(function(item) {
-                    $('#miner-table tbody').append(`<tr><td>${item.miner}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
+                    $('#miner-ore-table tbody').append(`<tr><td>${item.miner}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
+                });
+            }
+            function updateMinerOrzTable(data) {
+                $('#miner-orz-table tbody').empty();
+                data.forEach(function(item) {
+                    $('#miner-orz-table tbody').append(`<tr><td>${item.miner}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
                 });
             }
 
-            function updateMinerSummaryTable(data) {
-                $('#miner-summary-table tbody').empty();
-                let summaryMiners = [];
+            function updateMinerOreSummaryTable(data) {
+                $('#miner-ore-summary-table tbody').empty();
+                let summaryOreMiners = [];
 
-                summaryMiners.push({
+                summaryOreMiners.push({
                     ore_price: data.ore_price,
                     unclaimed: data.unclaimed,
                     value: data.value,
                 });
 
-                summaryMiners.forEach(function(item) {
-                    $('#miner-summary-table tbody').append(`<tr><td>${item.ore_price}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
+                summaryOreMiners.forEach(function(item) {
+                    $('#miner-ore-summary-table tbody').append(`<tr><td>${item.ore_price}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
                 });
             }
+            function updateMinerOrzSummaryTable(data) {
+                $('#miner-orz-summary-table tbody').empty();
+                let summaryOrzMiners = [];
 
+                summaryOrzMiners.push({
+                    orz_price: data.orz_price,
+                    unclaimed: data.unclaimed,
+                    value: data.value,
+                });
+
+                summaryOrzMiners.forEach(function(item) {
+                    $('#miner-orz-summary-table tbody').append(`<tr><td>${item.orz_price}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
+                });
+            }
             function updateWalletSummaryTable(data) {
                 $('#wallet-summary-table tbody').empty();
                 let summaryItems = [];
@@ -243,8 +262,10 @@
             function fetchData() {
                 showGreenDot();
                 $.getJSON('/data', function(response) {
-                    updateMinerTable(response.miners);
-                    updateMinerSummaryTable(response.miner_summary);
+                    updateMinerOreTable(response.miners_ore);
+                    updateMinerOrzTable(response.miners_orz);
+                    updateMinerOreSummaryTable(response.miner_ore_summary);
+                    updateMinerOrzSummaryTable(response.miner_orz_summary);
                     updateWalletSummaryTable(response.wallet_summary);
                     updateWalletTable(response.wallets);
                     if (response.errors && response.errors.length > 0) {
@@ -303,8 +324,8 @@
         </table>
     </div>
         <div class="container">
-        <h3>Miner Overview</h3>
-        <table id="miner-summary-table">
+        <h3>Miner Ore Overview</h3>
+        <table id="miner-ore-summary-table">
             <thead>
             <tr>
                 <th>Ore Price</th>
@@ -315,7 +336,30 @@
             <tbody>
             </tbody>
         </table>
-        <table id="miner-table">
+        <table id="miner-ore-table">
+            <thead>
+            <tr>
+                <th>Miner</th>
+                <th>Unclaimed</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <h3>Miner Ore Overview</h3>
+        <table id="miner-orz-summary-table">
+            <thead>
+            <tr>
+                <th>Orz Price</th>
+                <th>Unclaimed</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table id="miner-orz-table">
             <thead>
             <tr>
                 <th>Miner</th>

@@ -1,11 +1,13 @@
 package model
 
 type Obj struct {
-	Miners        []Miner       `json:"miners"`
-	MinerSummary  MinerSummary  `json:"miner_summary"`
-	WalletSummary WalletSummary `json:"wallet_summary"`
-	Wallets       []Wallet      `json:"wallets"`
-	Errors        []string      `json:"errors"`
+	MinersOre       []Miner         `json:"miners_ore"`
+	MinersOrz       []Miner         `json:"miners_orz"`
+	MinerOreSummary MinerOreSummary `json:"miner_ore_summary"`
+	MinerOrzSummary MinerOrzSummary `json:"miner_orz_summary"`
+	WalletSummary   WalletSummary   `json:"wallet_summary"`
+	Wallets         []Wallet        `json:"wallets"`
+	Errors          []string        `json:"errors"`
 }
 
 type WalletSummary struct {
@@ -14,8 +16,14 @@ type WalletSummary struct {
 	Value    string `json:"value"`
 }
 
-type MinerSummary struct {
+type MinerOreSummary struct {
 	OrePrice  string `json:"ore_price"`
+	Unclaimed string `json:"unclaimed"`
+	Value     string `json:"value"`
+}
+
+type MinerOrzSummary struct {
+	OrzPrice  string `json:"orz_price"`
 	Unclaimed string `json:"unclaimed"`
 	Value     string `json:"value"`
 }
