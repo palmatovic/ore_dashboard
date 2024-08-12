@@ -15,7 +15,6 @@ import (
 
 type Environment struct {
 	OreCli            string `env:"ORE_CLI,required"`
-	OrzCli            string `env:"ORZ_CLI,required"`
 	KeyPairFolderPath string `env:"KEY_PAIR_FOLDER_PATH,required"`
 	JupApiUrl         string `env:"JUP_API_URL,required"`
 	ServerPort        int    `env:"SERVER_PORT,required"`
@@ -37,11 +36,10 @@ func main() {
 
 	var tokenMap = map[string]string{
 		"ORE": "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
-		"ORZ": "3eEUXWsvEF3Mrd2m7VWWz9Akk7PirNJi9uZNcG93KoSM",
 		"SOL": "So11111111111111111111111111111111111111112",
 	}
 
-	s := service.NewService(util.NewUnclaimedData(cfg.OreCli, cfg.OrzCli), util.NewTokensPrice(cfg.JupApiUrl), cfg.KeyPairFolderPath, cfg.RpcUrl, tokenMap, cfg.SolCli)
+	s := service.NewService(util.NewUnclaimedData(cfg.OreCli), util.NewTokensPrice(cfg.JupApiUrl), cfg.KeyPairFolderPath, cfg.RpcUrl, tokenMap, cfg.SolCli)
 
 	templateDir := filepath.Join(currentDir, "pkg", "templates")
 

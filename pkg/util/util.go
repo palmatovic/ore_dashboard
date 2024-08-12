@@ -16,26 +16,20 @@ type CLI int64
 
 const (
 	OreCLI CLI = iota
-	OrzCLI
 )
 
 type UnclaimedData struct {
 	oreCli string
-	orzCli string
 }
 
-func NewUnclaimedData(oreCli string, orzCli string) *UnclaimedData {
+func NewUnclaimedData(oreCli string) *UnclaimedData {
 	return &UnclaimedData{
 		oreCli: oreCli,
-		orzCli: orzCli,
 	}
 }
 
 func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 	cli := u.oreCli
-	if c == OrzCLI {
-		cli = u.orzCli
-	}
 	cmd := exec.Command(cli, "balance", "--keypair", keypair)
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
@@ -60,11 +54,6 @@ func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 					unclaimed = value
 				}
 			}
-		}
-	} else if c == OrzCLI {
-		unclaimed, err = strconv.ParseFloat(strings.TrimSpace(strings.Split(stdout.String(), " ")[0]), 64)
-		if err != nil {
-			return 0, err
 		}
 	}
 	return unclaimed, nil

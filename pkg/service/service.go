@@ -34,14 +34,13 @@ func NewService(unclaimedData *util.UnclaimedData, orePrice *util.TokenPrice, ke
 }
 
 func (s *Service) GenerateData() *model.Obj {
-	var dataOre, dataOrz []model.Miner
+	var dataOre []model.Miner
 	var errs []string
-	var totalUnclaimedOre, totalUnclaimedOrz float64
+	var totalUnclaimedOre float64
 	var wallets []model.Wallet
 
 	var oreData util.Data
 	var solData util.Data
-	var orzData util.Data
 	var wg sync.WaitGroup
 
 	wg.Add(2)
@@ -58,15 +57,6 @@ func (s *Service) GenerateData() *model.Obj {
 		defer wg.Done()
 		var err error
 		solData, err = s.tokenPrice.Get(s.tokensToSearch["SOL"])
-		if err != nil {
-			errs = append(errs, fmt.Sprintf("cannot get SOL token prices: %s", err.Error()))
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		var err error
-		orzData, err = s.tokenPrice.Get(s.tokensToSearch["ORZ"])
 		if err != nil {
 			errs = append(errs, fmt.Sprintf("cannot get SOL token prices: %s", err.Error()))
 		}
@@ -110,23 +100,8 @@ func (s *Service) GenerateData() *model.Obj {
 				}
 				totalUnclaimedOre += unclaimedOre
 
-				var unclaimedOrz float64
-				if unclaimedOrz, err = s.unclaimedData.Get(util.OrzCLI, keyPairFilepath); err != nil {
-					eMux.Lock()
-					defer eMux.Unlock()
-					errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
-					return
-				}
-				var minerOrz = model.Miner{
-					Miner:     fmt.Sprintf("#%d", minerId),
-					Unclaimed: fmt.Sprintf("%.6f ORZ", unclaimedOrz),
-					Value:     fmt.Sprintf("%.2f $", unclaimedOrz*orzData.Price),
-				}
-				totalUnclaimedOrz += unclaimedOrz
-
 				mux.Lock()
 				dataOre = append(dataOre, minerOre)
-				dataOrz = append(dataOrz, minerOrz)
 				mux.Unlock()
 
 				var walletData *model.Wallet
@@ -158,11 +133,6 @@ func (s *Service) GenerateData() *model.Obj {
 		id2, _ := strconv.Atoi(dataOre[j].Miner[1:])
 		return id1 < id2
 	})
-	sort.Slice(dataOrz, func(i, j int) bool {
-		id1, _ := strconv.Atoi(dataOrz[i].Miner[1:])
-		id2, _ := strconv.Atoi(dataOrz[j].Miner[1:])
-		return id1 < id2
-	})
 
 	sort.Slice(wallets, func(i, j int) bool {
 		id1, _ := strconv.Atoi(wallets[i].WalletId[1:])
@@ -172,16 +142,10 @@ func (s *Service) GenerateData() *model.Obj {
 
 	return &model.Obj{
 		MinersOre: dataOre,
-		MinersOrz: dataOrz,
 		MinerOreSummary: model.MinerOreSummary{
 			OrePrice:  fmt.Sprintf("%.2f $", oreData.Price),
 			Unclaimed: fmt.Sprintf("%.6f ORE", totalUnclaimedOre),
 			Value:     fmt.Sprintf("%.2f $", totalUnclaimedOre*oreData.Price),
-		},
-		MinerOrzSummary: model.MinerOrzSummary{
-			OrzPrice:  fmt.Sprintf("%.2f $", orzData.Price),
-			Unclaimed: fmt.Sprintf("%.6f ORZ", totalUnclaimedOrz),
-			Value:     fmt.Sprintf("%.2f $", totalUnclaimedOrz*orzData.Price),
 		},
 		Errors:  errs,
 		Wallets: wallets,
