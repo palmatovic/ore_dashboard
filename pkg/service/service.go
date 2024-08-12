@@ -43,7 +43,7 @@ func (s *Service) GenerateData() *model.Obj {
 	var solData util.Data
 	var wg sync.WaitGroup
 
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		defer wg.Done()
 		var err error
