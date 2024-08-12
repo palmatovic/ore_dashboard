@@ -13,7 +13,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -64,8 +63,6 @@ func (s *Service) GenerateData() *model.Obj {
 
 	wg.Wait()
 
-	pattern := regexp.MustCompile(`^id_(\d+)\.json$`)
-
 	files, err := os.ReadDir(s.keyPairFolderPath)
 	if err != nil {
 		logrus.WithError(err).Error("cannot read directory")
@@ -75,55 +72,50 @@ func (s *Service) GenerateData() *model.Obj {
 	var bestWalletValue, totalWalletValue float64
 	var bestWallet string
 	var mux, eMux, wMux sync.Mutex
+	for idx, file := range files {
+		wg.Add(1)
+		go func(f os.DirEntry, i int) {
+			defer wg.Done()
 
-	for _, file := range files {
-		matches := pattern.FindStringSubmatch(file.Name())
-		if len(matches) == 2 {
-			wg.Add(1)
-			go func(file os.DirEntry) {
-				defer wg.Done()
-				i := matches[1]
-				keyPairFilepath := fmt.Sprintf("%s/id_%s.json", s.keyPairFolderPath, i)
-				minerId, _ := strconv.Atoi(i)
+			var keyPairFilepath = path.Join(s.keyPairFolderPath, f.Name())
+			var unclaimedOre float64
+			if unclaimedOre, err = s.unclaimedData.Get(util.OreCLI, keyPairFilepath); err != nil {
+				eMux.Lock()
+				defer eMux.Unlock()
+				errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
+				return
+			}
+			var minerOre = model.Miner{
+				Miner:     fmt.Sprintf("#%d", i),
+				Unclaimed: fmt.Sprintf("%.6f ORE", unclaimedOre),
+				Value:     fmt.Sprintf("%.2f $", unclaimedOre*oreData.Price),
+			}
+			totalUnclaimedOre += unclaimedOre
 
-				var unclaimedOre float64
-				if unclaimedOre, err = s.unclaimedData.Get(util.OreCLI, keyPairFilepath); err != nil {
-					eMux.Lock()
-					defer eMux.Unlock()
-					errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
-					return
-				}
-				var minerOre = model.Miner{
-					Miner:     fmt.Sprintf("#%d", minerId),
-					Unclaimed: fmt.Sprintf("%.6f ORE", unclaimedOre),
-					Value:     fmt.Sprintf("%.2f $", unclaimedOre*oreData.Price),
-				}
-				totalUnclaimedOre += unclaimedOre
+			mux.Lock()
+			dataOre = append(dataOre, minerOre)
+			mux.Unlock()
 
-				mux.Lock()
-				dataOre = append(dataOre, minerOre)
-				mux.Unlock()
+			var walletData *model.Wallet
+			var v float64
+			walletData, v, err = s.getWalletData(i, keyPairFilepath, solData.Price)
+			if err != nil {
+				eMux.Lock()
+				defer eMux.Unlock()
+				errs = append(errs, fmt.Sprintf("cannot get wallet data error:  %s", err.Error()))
+				return
+			}
 
-				var walletData *model.Wallet
-				var v float64
-				walletData, v, err = s.getWalletData(minerId, keyPairFilepath, solData.Price)
-				if err != nil {
-					eMux.Lock()
-					defer eMux.Unlock()
-					errs = append(errs, fmt.Sprintf("cannot get wallet data error:  %s", err.Error()))
-					return
-				}
+			totalWalletValue += v
+			if v > bestWalletValue {
+				bestWalletValue = v
+				bestWallet = walletData.WalletId
+			}
+			wMux.Lock()
+			wallets = append(wallets, *walletData)
+			wMux.Unlock()
+		}(file, idx)
 
-				totalWalletValue += v
-				if v > bestWalletValue {
-					bestWalletValue = v
-					bestWallet = walletData.WalletId
-				}
-				wMux.Lock()
-				wallets = append(wallets, *walletData)
-				wMux.Unlock()
-			}(file)
-		}
 	}
 
 	wg.Wait()
