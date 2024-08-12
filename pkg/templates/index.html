@@ -166,12 +166,6 @@
                     $('#miner-ore-table tbody').append(`<tr><td>${item.miner}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
                 });
             }
-            function updateMinerOrzTable(data) {
-                $('#miner-orz-table tbody').empty();
-                data.forEach(function(item) {
-                    $('#miner-orz-table tbody').append(`<tr><td>${item.miner}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
-                });
-            }
 
             function updateMinerOreSummaryTable(data) {
                 $('#miner-ore-summary-table tbody').empty();
@@ -187,20 +181,7 @@
                     $('#miner-ore-summary-table tbody').append(`<tr><td>${item.ore_price}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
                 });
             }
-            function updateMinerOrzSummaryTable(data) {
-                $('#miner-orz-summary-table tbody').empty();
-                let summaryOrzMiners = [];
 
-                summaryOrzMiners.push({
-                    orz_price: data.orz_price,
-                    unclaimed: data.unclaimed,
-                    value: data.value,
-                });
-
-                summaryOrzMiners.forEach(function(item) {
-                    $('#miner-orz-summary-table tbody').append(`<tr><td>${item.orz_price}</td><td>${item.unclaimed}</td><td>${item.value}</td></tr>`);
-                });
-            }
             function updateWalletSummaryTable(data) {
                 $('#wallet-summary-table tbody').empty();
                 let summaryItems = [];
@@ -263,9 +244,7 @@
                 showGreenDot();
                 $.getJSON('/data', function(response) {
                     updateMinerOreTable(response.miners_ore);
-                    updateMinerOrzTable(response.miners_orz);
                     updateMinerOreSummaryTable(response.miner_ore_summary);
-                    updateMinerOrzSummaryTable(response.miner_orz_summary);
                     updateWalletSummaryTable(response.wallet_summary);
                     updateWalletTable(response.wallets);
                     if (response.errors && response.errors.length > 0) {
@@ -337,29 +316,6 @@
             </tbody>
         </table>
         <table id="miner-ore-table">
-            <thead>
-            <tr>
-                <th>Miner</th>
-                <th>Unclaimed</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <h3>Miner <img style="width: 30px;" src="data:image/png;base64,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"/></h3>
-        <table id="miner-orz-summary-table">
-            <thead>
-            <tr>
-                <th>Orz Price</th>
-                <th>Unclaimed</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        <table id="miner-orz-table">
             <thead>
             <tr>
                 <th>Miner</th>
