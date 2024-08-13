@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Ore/pkg/service"
-	"Ore/pkg/util"
+	"Coal/pkg/service"
+	"Coal/pkg/util"
 	"encoding/json"
 	"fmt"
 	"github.com/caarlos0/env/v6"
@@ -14,7 +14,7 @@ import (
 )
 
 type Environment struct {
-	OreCli            string `env:"ORE_CLI,required"`
+	CoalCli           string `env:"COAL_CLI,required"`
 	KeyPairFolderPath string `env:"KEY_PAIR_FOLDER_PATH,required"`
 	JupApiUrl         string `env:"JUP_API_URL,required"`
 	ServerPort        int    `env:"SERVER_PORT,required"`
@@ -35,11 +35,11 @@ func main() {
 	}
 
 	var tokenMap = map[string]string{
-		"ORE": "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
-		"SOL": "So11111111111111111111111111111111111111112",
+		"COAL": "coaloU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
+		"SOL":  "So11111111111111111111111111111111111111112",
 	}
 
-	s := service.NewService(util.NewUnclaimedData(cfg.OreCli), util.NewTokensPrice(cfg.JupApiUrl), cfg.KeyPairFolderPath, cfg.RpcUrl, tokenMap, cfg.SolCli)
+	s := service.NewService(util.NewUnclaimedData(cfg.CoalCli), util.NewTokensPrice(cfg.JupApiUrl), cfg.KeyPairFolderPath, cfg.RpcUrl, tokenMap, cfg.SolCli)
 
 	templateDir := filepath.Join(currentDir, "pkg", "templates")
 

@@ -1,4 +1,4 @@
-module Ore
+module Coal
 
 go 1.22.5
 

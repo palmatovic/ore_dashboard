@@ -15,21 +15,21 @@ import (
 type CLI int64
 
 const (
-	OreCLI CLI = iota
+	CoalCLI CLI = iota
 )
 
 type UnclaimedData struct {
-	oreCli string
+	coalCli string
 }
 
-func NewUnclaimedData(oreCli string) *UnclaimedData {
+func NewUnclaimedData(coalCli string) *UnclaimedData {
 	return &UnclaimedData{
-		oreCli: oreCli,
+		coalCli: coalCli,
 	}
 }
 
 func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
-	cli := u.oreCli
+	cli := u.coalCli
 	cmd := exec.Command(cli, "balance", "--keypair", keypair)
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
@@ -39,7 +39,7 @@ func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 	}
 	var err error
 	var unclaimed float64
-	if c == OreCLI {
+	if c == CoalCLI {
 		lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
 		for _, line := range lines {
 			parts := strings.Fields(line)
@@ -60,12 +60,12 @@ func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 }
 
 type TokenPrice struct {
-	jupOreApiUrl string
+	jupCoalApiUrl string
 }
 
-func NewTokensPrice(jupOreApiUrl string) *TokenPrice {
+func NewTokensPrice(jupCoalApiUrl string) *TokenPrice {
 	return &TokenPrice{
-		jupOreApiUrl: jupOreApiUrl,
+		jupCoalApiUrl: jupCoalApiUrl,
 	}
 }
 
@@ -84,7 +84,7 @@ type Response struct {
 
 func (o *TokenPrice) Get(tokenAddress string) (tokenData Data, err error) {
 	var resp *http.Response
-	resp, err = http.Get(o.jupOreApiUrl + tokenAddress)
+	resp, err = http.Get(o.jupCoalApiUrl + tokenAddress)
 	if err != nil {
 		return Data{}, err
 	}

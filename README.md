@@ -1,17 +1,17 @@
 
-# Ore Dashboard
+# Coal Dashboard
 
 
 
 ## Introduction
 
-A tiny dashboard for visualizing ORE mining data. It utilizes Golang for backend logic and HTML/CSS/JavaScript for the user interface.
+A tiny dashboard for visualizing COAL mining data. It utilizes Golang for backend logic and HTML/CSS/JavaScript for the user interface.
 Currently, the update frequency has been set statically, every 60 seconds.
 
 ## Prerequisites
 
 - Golang 1.22.5
-- [Ore CLI](https://ore.supply/download)
+- [Coal CLI](https://coal.supply/download)
 - Solana Keypair Folder: each file must have sintax like "**id_x.json**" where "**x**" is an integer
 
 ## Build:
@@ -19,14 +19,14 @@ Currently, the update frequency has been set statically, every 60 seconds.
 Clone the repository into a local directory:
 
 ```bash
-$ git clone https://github.com/palmatovic/ore_dashboard.git
+$ git clone https://github.com/palmatovic/coal_dashboard.git
 ```
 
 
 Navigate to the project directory:
 
 ```bash
-$ cd ore_dashboard.git
+$ cd coal_dashboard.git
 ```
 
 Build the project by running the following command:
@@ -46,9 +46,9 @@ $ export SOLANA_CLI=<SOLANA_CLI_FOLDER_PATH>
 ```bash
 $ export RPC_URL=<RPC_URL>
 ```
-**ORE CLI**
+**COAL CLI**
 ```bash
-$ export ORE_CLI=<YOUR_ORE_BIN_FILEPATH>
+$ export COAL_CLI=<YOUR_COAL_BIN_FILEPATH>
 ```
 
 **Keypairs folder path**
@@ -72,7 +72,7 @@ $ go run main.go
 ```
 
 ## Server:
-Enjoy Ore Dashboard
+Enjoy Coal Dashboard
 ``` html
 http://localhost:<YOUR_PORT>
 ```
@@ -93,7 +93,7 @@ ExecStart=<YOUR EXECUTABLE PATH>
 Restart=always
 RestartSec=3
 User=<YOUR_USER>
-Environment="ORE_CLI=<YOUR_ORE_BIN_FILEPATH>"
+Environment="COAL_CLI=<YOUR_COAL_BIN_FILEPATH>"
 Environment="SOLANA_CLI=<YOUR_SOLANA_CLI_FOLDERPATH>"
 Environment="RPC_URL=<YOUR_RPC_URL>"
 Environment="KEY_PAIR_FOLDER_PATH=<YOUR_KEY_PAIR_FORLDER_PATH>"

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"Ore/pkg/model"
-	"Ore/pkg/util"
+	"Coal/pkg/model"
+	"Coal/pkg/util"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -28,17 +28,17 @@ type Service struct {
 	solanaCli         string
 }
 
-func NewService(unclaimedData *util.UnclaimedData, orePrice *util.TokenPrice, keyPairFolderPath string, rpcUrl string, tokensToSearch map[string]string, solanaCli string) *Service {
-	return &Service{unclaimedData, orePrice, keyPairFolderPath, rpcUrl, tokensToSearch, solanaCli}
+func NewService(unclaimedData *util.UnclaimedData, coalPrice *util.TokenPrice, keyPairFolderPath string, rpcUrl string, tokensToSearch map[string]string, solanaCli string) *Service {
+	return &Service{unclaimedData, coalPrice, keyPairFolderPath, rpcUrl, tokensToSearch, solanaCli}
 }
 
 func (s *Service) GenerateData() *model.Obj {
-	var dataOre []model.Miner
+	var dataCoal []model.Miner
 	var errs []string
-	var totalUnclaimedOre float64
+	var totalUnclaimedCoal float64
 	var wallets []model.Wallet
 
-	var oreData util.Data
+	var coalData util.Data
 	var solData util.Data
 	var wg sync.WaitGroup
 
@@ -46,9 +46,9 @@ func (s *Service) GenerateData() *model.Obj {
 	go func() {
 		defer wg.Done()
 		var err error
-		oreData, err = s.tokenPrice.Get(s.tokensToSearch["ORE"])
+		coalData, err = s.tokenPrice.Get(s.tokensToSearch["COAL"])
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("cannot get ORE token prices: %s", err.Error()))
+			errs = append(errs, fmt.Sprintf("cannot get COAL token prices: %s", err.Error()))
 		}
 	}()
 
@@ -78,22 +78,22 @@ func (s *Service) GenerateData() *model.Obj {
 			defer wg.Done()
 
 			var keyPairFilepath = path.Join(s.keyPairFolderPath, f.Name())
-			var unclaimedOre float64
-			if unclaimedOre, err = s.unclaimedData.Get(util.OreCLI, keyPairFilepath); err != nil {
+			var unclaimedCoal float64
+			if unclaimedCoal, err = s.unclaimedData.Get(util.CoalCLI, keyPairFilepath); err != nil {
 				eMux.Lock()
 				defer eMux.Unlock()
 				errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
 				return
 			}
-			var minerOre = model.Miner{
+			var minerCoal = model.Miner{
 				Miner:     fmt.Sprintf("#%d", i),
-				Unclaimed: fmt.Sprintf("%.6f ORE", unclaimedOre),
-				Value:     fmt.Sprintf("%.2f $", unclaimedOre*oreData.Price),
+				Unclaimed: fmt.Sprintf("%.6f COAL", unclaimedCoal),
+				Value:     fmt.Sprintf("%.2f $", unclaimedCoal*coalData.Price),
 			}
-			totalUnclaimedOre += unclaimedOre
+			totalUnclaimedCoal += unclaimedCoal
 
 			mux.Lock()
-			dataOre = append(dataOre, minerOre)
+			dataCoal = append(dataCoal, minerCoal)
 			mux.Unlock()
 
 			var walletData *model.Wallet
@@ -120,9 +120,9 @@ func (s *Service) GenerateData() *model.Obj {
 
 	wg.Wait()
 
-	sort.Slice(dataOre, func(i, j int) bool {
-		id1, _ := strconv.Atoi(dataOre[i].Miner[1:])
-		id2, _ := strconv.Atoi(dataOre[j].Miner[1:])
+	sort.Slice(dataCoal, func(i, j int) bool {
+		id1, _ := strconv.Atoi(dataCoal[i].Miner[1:])
+		id2, _ := strconv.Atoi(dataCoal[j].Miner[1:])
 		return id1 < id2
 	})
 
@@ -133,11 +133,11 @@ func (s *Service) GenerateData() *model.Obj {
 	})
 
 	return &model.Obj{
-		MinersOre: dataOre,
-		MinerOreSummary: model.MinerOreSummary{
-			OrePrice:  fmt.Sprintf("%.2f $", oreData.Price),
-			Unclaimed: fmt.Sprintf("%.6f ORE", totalUnclaimedOre),
-			Value:     fmt.Sprintf("%.2f $", totalUnclaimedOre*oreData.Price),
+		MinersCoal: dataCoal,
+		MinerCoalSummary: model.MinerCoalSummary{
+			CoalPrice: fmt.Sprintf("%.2f $", coalData.Price),
+			Unclaimed: fmt.Sprintf("%.6f COAL", totalUnclaimedCoal),
+			Value:     fmt.Sprintf("%.2f $", totalUnclaimedCoal*coalData.Price),
 		},
 		Errors:  errs,
 		Wallets: wallets,
