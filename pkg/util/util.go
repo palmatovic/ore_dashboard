@@ -45,20 +45,18 @@ func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 	}
 	var err error
 	var unclaimed float64
-	if c == Coal || c == Ore {
-		lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
-		for _, line := range lines {
-			parts := strings.Fields(line)
-			if len(parts) >= 3 {
-				valueStr := parts[1]
-				var value float64
-				value, err = strconv.ParseFloat(valueStr, 64)
-				if err != nil {
-					return 0, err
-				}
-				if parts[0] == "Stake:" {
-					unclaimed = value
-				}
+	lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+	for _, line := range lines {
+		parts := strings.Fields(line)
+		if len(parts) >= 3 {
+			valueStr := parts[1]
+			var value float64
+			value, err = strconv.ParseFloat(valueStr, 64)
+			if err != nil {
+				return 0, err
+			}
+			if parts[0] == "Stake:" {
+				unclaimed = value
 			}
 		}
 	}

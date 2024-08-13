@@ -14,7 +14,7 @@ import (
 )
 
 type Environment struct {
-	OreCli            string `json:"ORE_CLI,required"`
+	OreCli            string `env:"ORE_CLI,required"`
 	CoalCli           string `env:"COAL_CLI,required"`
 	KeyPairFolderPath string `env:"KEY_PAIR_FOLDER_PATH,required"`
 	JupApiUrl         string `env:"JUP_API_URL,required"`
