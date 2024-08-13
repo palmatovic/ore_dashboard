@@ -48,28 +48,27 @@ func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 	lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
 	for _, line := range lines {
 		parts := strings.Fields(line)
-		if len(parts) >= 3 {
+		if parts[0] == "Stake:" {
 			valueStr := parts[1]
 			var value float64
 			value, err = strconv.ParseFloat(valueStr, 64)
 			if err != nil {
 				return 0, err
 			}
-			if parts[0] == "Stake:" {
-				unclaimed = value
-			}
+			unclaimed = value
+			break
 		}
 	}
 	return unclaimed, nil
 }
 
 type TokenPrice struct {
-	jupCoalApiUrl string
+	jupApiUrl string
 }
 
-func NewTokensPrice(jupCoalApiUrl string) *TokenPrice {
+func NewTokensPrice(jupApiUrl string) *TokenPrice {
 	return &TokenPrice{
-		jupCoalApiUrl: jupCoalApiUrl,
+		jupApiUrl: jupApiUrl,
 	}
 }
 
@@ -88,7 +87,7 @@ type Response struct {
 
 func (o *TokenPrice) Get(tokenAddress string) (tokenData Data, err error) {
 	var resp *http.Response
-	resp, err = http.Get(o.jupCoalApiUrl + tokenAddress)
+	resp, err = http.Get(o.jupApiUrl + tokenAddress)
 	if err != nil {
 		return Data{}, err
 	}

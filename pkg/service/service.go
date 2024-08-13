@@ -94,7 +94,7 @@ func (s *Service) GenerateData() *model.Obj {
 			if unclaimedCoal, err = s.unclaimedData.Get(util.Coal, keyPairFilepath); err != nil {
 				eMux.Lock()
 				defer eMux.Unlock()
-				errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
+				errs = append(errs, fmt.Sprintf("cannot get miner coal unclaimed data error:  %s", err.Error()))
 				return
 			}
 			var minerCoal = model.Miner{
@@ -108,7 +108,7 @@ func (s *Service) GenerateData() *model.Obj {
 			if unclaimedOre, err = s.unclaimedData.Get(util.Ore, keyPairFilepath); err != nil {
 				eMux.Lock()
 				defer eMux.Unlock()
-				errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
+				errs = append(errs, fmt.Sprintf("cannot get miner ore unclaimed data error:  %s", err.Error()))
 				return
 			}
 			var minerOre = model.Miner{
