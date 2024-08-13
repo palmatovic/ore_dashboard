@@ -34,11 +34,14 @@ func NewService(unclaimedData *util.UnclaimedData, coalPrice *util.TokenPrice, k
 
 func (s *Service) GenerateData() *model.Obj {
 	var dataCoal []model.Miner
+	var dataOre []model.Miner
 	var errs []string
 	var totalUnclaimedCoal float64
+	var totalUnclaimedOre float64
 	var wallets []model.Wallet
 
 	var coalData util.Data
+	var oreData util.Data
 	var solData util.Data
 	var wg sync.WaitGroup
 
@@ -61,6 +64,15 @@ func (s *Service) GenerateData() *model.Obj {
 		}
 	}()
 
+	go func() {
+		defer wg.Done()
+		var err error
+		solData, err = s.tokenPrice.Get(s.tokensToSearch["ORE"])
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("cannot get ORE token prices: %s", err.Error()))
+		}
+	}()
+
 	wg.Wait()
 
 	files, err := os.ReadDir(s.keyPairFolderPath)
@@ -79,7 +91,7 @@ func (s *Service) GenerateData() *model.Obj {
 
 			var keyPairFilepath = path.Join(s.keyPairFolderPath, f.Name())
 			var unclaimedCoal float64
-			if unclaimedCoal, err = s.unclaimedData.Get(util.CoalCLI, keyPairFilepath); err != nil {
+			if unclaimedCoal, err = s.unclaimedData.Get(util.Coal, keyPairFilepath); err != nil {
 				eMux.Lock()
 				defer eMux.Unlock()
 				errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
@@ -92,8 +104,23 @@ func (s *Service) GenerateData() *model.Obj {
 			}
 			totalUnclaimedCoal += unclaimedCoal
 
+			var unclaimedOre float64
+			if unclaimedOre, err = s.unclaimedData.Get(util.Ore, keyPairFilepath); err != nil {
+				eMux.Lock()
+				defer eMux.Unlock()
+				errs = append(errs, fmt.Sprintf("cannot get miner unclaimed data error:  %s", err.Error()))
+				return
+			}
+			var minerOre = model.Miner{
+				Miner:     fmt.Sprintf("#%d", i),
+				Unclaimed: fmt.Sprintf("%.6f ORE", unclaimedOre),
+				Value:     fmt.Sprintf("%.2f $", unclaimedOre*oreData.Price),
+			}
+			totalUnclaimedOre += unclaimedOre
+
 			mux.Lock()
 			dataCoal = append(dataCoal, minerCoal)
+			dataOre = append(dataOre, minerOre)
 			mux.Unlock()
 
 			var walletData *model.Wallet
@@ -126,6 +153,12 @@ func (s *Service) GenerateData() *model.Obj {
 		return id1 < id2
 	})
 
+	sort.Slice(dataOre, func(i, j int) bool {
+		id1, _ := strconv.Atoi(dataOre[i].Miner[1:])
+		id2, _ := strconv.Atoi(dataOre[j].Miner[1:])
+		return id1 < id2
+	})
+
 	sort.Slice(wallets, func(i, j int) bool {
 		id1, _ := strconv.Atoi(wallets[i].WalletId[1:])
 		id2, _ := strconv.Atoi(wallets[j].WalletId[1:])
@@ -138,6 +171,12 @@ func (s *Service) GenerateData() *model.Obj {
 			CoalPrice: fmt.Sprintf("%.2f $", coalData.Price),
 			Unclaimed: fmt.Sprintf("%.6f COAL", totalUnclaimedCoal),
 			Value:     fmt.Sprintf("%.2f $", totalUnclaimedCoal*coalData.Price),
+		},
+		MinersOre: dataOre,
+		MinerOreSummary: model.MinerCoalSummary{
+			CoalPrice: fmt.Sprintf("%.2f $", coalData.Price),
+			Unclaimed: fmt.Sprintf("%.6f ORE", totalUnclaimedOre),
+			Value:     fmt.Sprintf("%.2f $", totalUnclaimedOre*oreData.Price),
 		},
 		Errors:  errs,
 		Wallets: wallets,

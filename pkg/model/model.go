@@ -6,6 +6,8 @@ type Obj struct {
 	WalletSummary    WalletSummary    `json:"wallet_summary"`
 	Wallets          []Wallet         `json:"wallets"`
 	Errors           []string         `json:"errors"`
+	MinersOre        []Miner          `json:"miners_ore"`
+	MinerOreSummary  MinerCoalSummary `json:"miner_ore_summary"`
 }
 
 type WalletSummary struct {

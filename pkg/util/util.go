@@ -15,21 +15,27 @@ import (
 type CLI int64
 
 const (
-	CoalCLI CLI = iota
+	Coal CLI = iota
+	Ore
 )
 
 type UnclaimedData struct {
 	coalCli string
+	oreCli  string
 }
 
-func NewUnclaimedData(coalCli string) *UnclaimedData {
+func NewUnclaimedData(coalCli string, oreCli string) *UnclaimedData {
 	return &UnclaimedData{
 		coalCli: coalCli,
+		oreCli:  oreCli,
 	}
 }
 
 func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 	cli := u.coalCli
+	if c == Ore {
+		cli = u.oreCli
+	}
 	cmd := exec.Command(cli, "balance", "--keypair", keypair)
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
@@ -39,7 +45,7 @@ func (u *UnclaimedData) Get(c CLI, keypair string) (float64, error) {
 	}
 	var err error
 	var unclaimed float64
-	if c == CoalCLI {
+	if c == Coal || c == Ore {
 		lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
 		for _, line := range lines {
 			parts := strings.Fields(line)
