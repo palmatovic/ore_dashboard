@@ -35,7 +35,7 @@ func main() {
 	}
 
 	var tokenMap = map[string]string{
-		"COAL": "coaloU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
+		"COAL": "E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
 		"SOL":  "So11111111111111111111111111111111111111112",
 	}
 
