@@ -2,12 +2,12 @@ package model
 
 type Obj struct {
 	MinersCoal       []Miner          `json:"miners_coal"`
+	MinersOre        []Miner          `json:"miners_ore"`
 	MinerCoalSummary MinerCoalSummary `json:"miner_coal_summary"`
+	MinerOreSummary  MinerOreSummary  `json:"miner_ore_summary"`
 	WalletSummary    WalletSummary    `json:"wallet_summary"`
 	Wallets          []Wallet         `json:"wallets"`
 	Errors           []string         `json:"errors"`
-	MinersOre        []Miner          `json:"miners_ore"`
-	MinerOreSummary  MinerOreSummary  `json:"miner_ore_summary"`
 }
 
 type WalletSummary struct {

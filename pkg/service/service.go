@@ -49,9 +49,9 @@ func (s *Service) GenerateData() *model.Obj {
 	go func() {
 		defer wg.Done()
 		var err error
-		coalData, err = s.tokenPrice.Get(s.tokensToSearch["COAL"])
+		coalData, err = s.tokenPrice.Get(s.tokensToSearch["coal"])
 		if err != nil {
-			errs = append(errs, fmt.Sprintf("cannot get COAL token prices: %s", err.Error()))
+			errs = append(errs, fmt.Sprintf("cannot get coal token prices: %s", err.Error()))
 		}
 	}()
 
@@ -91,26 +91,17 @@ func (s *Service) GenerateData() *model.Obj {
 
 			var keyPairFilepath = path.Join(s.keyPairFolderPath, f.Name())
 			var unclaimedCoal float64
-			if unclaimedCoal, err = s.unclaimedData.Get(util.Coal, keyPairFilepath); err != nil {
-				eMux.Lock()
-				defer eMux.Unlock()
-				errs = append(errs, fmt.Sprintf("cannot get miner coal unclaimed data error:  %s", err.Error()))
-				return
-			}
+			unclaimedCoal, _ = s.unclaimedData.Get(util.Coal, keyPairFilepath)
 			var minerCoal = model.Miner{
 				Miner:     fmt.Sprintf("#%d", i),
-				Unclaimed: fmt.Sprintf("%.6f COAL", unclaimedCoal),
+				Unclaimed: fmt.Sprintf("%.6f coal", unclaimedCoal),
 				Value:     fmt.Sprintf("%.2f $", unclaimedCoal*coalData.Price),
 			}
 			totalUnclaimedCoal += unclaimedCoal
 
 			var unclaimedOre float64
-			if unclaimedOre, err = s.unclaimedData.Get(util.Ore, keyPairFilepath); err != nil {
-				eMux.Lock()
-				defer eMux.Unlock()
-				errs = append(errs, fmt.Sprintf("cannot get miner ore unclaimed data error:  %s", err.Error()))
-				return
-			}
+			unclaimedOre, _ = s.unclaimedData.Get(util.Ore, keyPairFilepath)
+
 			var minerOre = model.Miner{
 				Miner:     fmt.Sprintf("#%d", i),
 				Unclaimed: fmt.Sprintf("%.6f ORE", unclaimedOre),
@@ -169,7 +160,7 @@ func (s *Service) GenerateData() *model.Obj {
 		MinersCoal: dataCoal,
 		MinerCoalSummary: model.MinerCoalSummary{
 			CoalPrice: fmt.Sprintf("%.2f $", coalData.Price),
-			Unclaimed: fmt.Sprintf("%.6f COAL", totalUnclaimedCoal),
+			Unclaimed: fmt.Sprintf("%.6f coal", totalUnclaimedCoal),
 			Value:     fmt.Sprintf("%.2f $", totalUnclaimedCoal*coalData.Price),
 		},
 		MinersOre: dataOre,
