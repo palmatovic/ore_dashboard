@@ -173,8 +173,8 @@ func (s *Service) GenerateData() *model.Obj {
 			Value:     fmt.Sprintf("%.2f $", totalUnclaimedCoal*coalData.Price),
 		},
 		MinersOre: dataOre,
-		MinerOreSummary: model.MinerCoalSummary{
-			CoalPrice: fmt.Sprintf("%.2f $", coalData.Price),
+		MinerOreSummary: model.MinerOreSummary{
+			OrePrice:  fmt.Sprintf("%.2f $", oreData.Price),
 			Unclaimed: fmt.Sprintf("%.6f ORE", totalUnclaimedOre),
 			Value:     fmt.Sprintf("%.2f $", totalUnclaimedOre*oreData.Price),
 		},

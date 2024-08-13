@@ -7,7 +7,7 @@ type Obj struct {
 	Wallets          []Wallet         `json:"wallets"`
 	Errors           []string         `json:"errors"`
 	MinersOre        []Miner          `json:"miners_ore"`
-	MinerOreSummary  MinerCoalSummary `json:"miner_ore_summary"`
+	MinerOreSummary  MinerOreSummary  `json:"miner_ore_summary"`
 }
 
 type WalletSummary struct {
@@ -18,6 +18,11 @@ type WalletSummary struct {
 
 type MinerCoalSummary struct {
 	CoalPrice string `json:"coal_price"`
+	Unclaimed string `json:"unclaimed"`
+	Value     string `json:"value"`
+}
+type MinerOreSummary struct {
+	OrePrice  string `json:"ore_price"`
 	Unclaimed string `json:"unclaimed"`
 	Value     string `json:"value"`
 }

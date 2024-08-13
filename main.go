@@ -37,7 +37,7 @@ func main() {
 
 	var tokenMap = map[string]string{
 		"COAL": "E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
-		"ORE":  "address",
+		"ORE":  "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
 		"SOL":  "So11111111111111111111111111111111111111112",
 	}
 
